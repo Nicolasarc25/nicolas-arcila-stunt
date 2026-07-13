@@ -1,0 +1,604 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nicolas Arcila · Stunt Performer</title>
+<meta name="description" content="Nicolas Arcila — Stunt performer y fight choreographer con experiencia internacional. Narcos, Jack Ryan, Triple Frontier, Gemini Man.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0c0b;
+    --bg-panel: #161412;
+    --bg-card: #1c1916;
+    --line: #2c2823;
+    --text: #f2ede6;
+    --muted: #a89f93;
+    --accent: #e08b3d;
+    --accent-soft: rgba(224, 139, 61, 0.14);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Barlow", system-ui, sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse 90% 60% at 50% 0%, transparent 55%, rgba(0,0,0,0.55)),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.8' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+    z-index: 3;
+  }
+  .display { font-family: "Bebas Neue", "Barlow", sans-serif; letter-spacing: 0.04em; }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 28px;
+    background: linear-gradient(rgba(13,12,11,0.92), rgba(13,12,11,0.75) 70%, transparent);
+    backdrop-filter: blur(8px);
+    z-index: 10;
+  }
+  nav .logo { font-size: 22px; color: var(--text); text-decoration: none; }
+  nav .logo span { color: var(--accent); }
+  .nav-links { display: flex; gap: 22px; align-items: center; }
+  .nav-links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--accent); }
+  .lang-toggle {
+    border: 1px solid var(--line);
+    background: var(--bg-card);
+    color: var(--text);
+    font: 600 12px "Barlow", sans-serif;
+    letter-spacing: 0.1em;
+    padding: 7px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  .lang-toggle:hover { border-color: var(--accent); }
+  .lang-toggle b { color: var(--accent); }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100svh;
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    align-items: center;
+    gap: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 110px 28px 60px;
+  }
+  .hero-copy .eyebrow {
+    color: var(--accent);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    font-size: 13px;
+    margin-bottom: 14px;
+  }
+  .hero-copy h1 {
+    font-size: clamp(64px, 10vw, 128px);
+    line-height: 0.92;
+    text-transform: uppercase;
+  }
+  .hero-copy h1 em { font-style: normal; color: var(--accent); }
+  .hero-role {
+    margin-top: 18px;
+    font-size: clamp(17px, 2.4vw, 22px);
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .hero-badges { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 26px; }
+  .badge {
+    border: 1px solid var(--line);
+    background: var(--bg-panel);
+    border-radius: 999px;
+    padding: 7px 15px;
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .badge.hot { border-color: rgba(224,139,61,0.5); color: var(--accent); background: var(--accent-soft); }
+  .hero-cta { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 34px; }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 14px 26px;
+    border-radius: 6px;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .btn:hover { transform: translateY(-2px); }
+  .btn.primary { background: var(--accent); color: #17110a; box-shadow: 0 8px 30px rgba(224,139,61,0.25); }
+  .btn.ghost { border: 1px solid var(--line); color: var(--text); background: rgba(255,255,255,0.02); }
+  .btn.ghost:hover { border-color: var(--accent); }
+  .hero-figure { position: relative; justify-self: center; }
+  .hero-figure::before {
+    content: "";
+    position: absolute;
+    inset: -22px -22px 40px 30px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    z-index: 0;
+  }
+  .hero-figure img {
+    position: relative;
+    width: min(380px, 78vw);
+    border-radius: 10px;
+    display: block;
+    filter: contrast(1.04) saturate(0.96);
+    box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+    z-index: 1;
+  }
+  .hero-figure .tape {
+    position: absolute;
+    bottom: -16px;
+    left: -30px;
+    background: var(--accent);
+    color: #17110a;
+    font: 700 13px/1 "Barlow", sans-serif;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 12px 18px;
+    border-radius: 4px;
+    z-index: 2;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  }
+
+  /* ── SECTIONS ── */
+  section { max-width: 1200px; margin: 0 auto; padding: 90px 28px; }
+  .sec-head { margin-bottom: 46px; }
+  .sec-head .kicker {
+    color: var(--accent);
+    font-weight: 700;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    font-size: 12px;
+  }
+  .sec-head h2 {
+    font-size: clamp(40px, 6vw, 64px);
+    text-transform: uppercase;
+    line-height: 1;
+    margin-top: 8px;
+  }
+  .sec-head p { color: var(--muted); max-width: 640px; margin-top: 12px; }
+  .section-cta {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 28px;
+  }
+
+  /* credits */
+  .credits { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+  .credit {
+    position: relative;
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 26px 22px 22px;
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .credit:hover { border-color: rgba(224,139,61,0.55); transform: translateY(-3px); }
+  .credit .num {
+    position: absolute;
+    top: 10px; right: 16px;
+    font: 700 44px/1 "Bebas Neue", sans-serif;
+    color: rgba(255,255,255,0.05);
+  }
+  .credit h3 { font-family: "Bebas Neue", sans-serif; font-size: 30px; letter-spacing: 0.03em; line-height: 1; }
+  .credit .meta { color: var(--accent); font-size: 13px; font-weight: 600; margin-top: 6px; letter-spacing: 0.06em; }
+  .credit .desc { color: var(--muted); font-size: 14px; margin-top: 12px; }
+  .credit.coord { background: linear-gradient(135deg, var(--bg-card), rgba(224,139,61,0.09)); }
+  .credit .role-tag {
+    display: inline-block;
+    background: var(--accent);
+    color: #17110a;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    border-radius: 3px;
+    padding: 4px 9px;
+    margin-bottom: 12px;
+  }
+
+  /* skills */
+  .skills-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; }
+  .skill-list { display: grid; gap: 12px; }
+  .skill {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 15px 18px;
+    transition: border-color 0.2s;
+  }
+  .skill:hover { border-color: rgba(224,139,61,0.45); }
+  .skill .icon { font-size: 22px; width: 34px; text-align: center; flex-shrink: 0; }
+  .skill strong { font-size: 16px; font-weight: 600; }
+  .skill span { display: block; color: var(--muted); font-size: 13px; }
+  .headshots { display: grid; gap: 16px; position: sticky; top: 90px; }
+  .headshots img { width: 100%; border-radius: 10px; border: 1px solid var(--line); display: block; }
+
+  /* stats */
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; }
+  .stat {
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+  }
+  .stat .val { font-family: "Bebas Neue", sans-serif; font-size: 38px; color: var(--accent); line-height: 1; }
+  .stat .lab { color: var(--muted); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 8px; }
+  .measures { margin-top: 30px; display: flex; flex-wrap: wrap; gap: 10px; }
+  .measures .badge b { color: var(--text); font-weight: 600; margin-left: 4px; }
+
+  /* videos */
+  .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+  .video-grid video {
+    width: 100%;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    background: var(--bg-card);
+    display: block;
+  }
+  .video-note {
+    border: 1px dashed var(--line);
+    border-radius: 10px;
+    padding: 30px;
+    color: var(--muted);
+    text-align: center;
+    font-size: 15px;
+  }
+
+  /* contact */
+  .contact-box {
+    background: linear-gradient(135deg, var(--bg-card), rgba(224,139,61,0.08));
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: clamp(36px, 6vw, 70px);
+    text-align: center;
+  }
+  .contact-box h2 { font-size: clamp(38px, 6vw, 60px); text-transform: uppercase; line-height: 1.02; }
+  .contact-box p { color: var(--muted); margin-top: 14px; }
+  .contact-box .hero-cta { justify-content: center; }
+
+  footer {
+    text-align: center;
+    color: #6b6459;
+    font-size: 13px;
+    padding: 30px 20px 44px;
+  }
+
+  @media (max-width: 860px) {
+    .hero { grid-template-columns: 1fr; padding-top: 96px; text-align: center; }
+    .hero-badges, .hero-cta { justify-content: center; }
+    .hero-figure { margin-top: 20px; }
+    .hero-figure .tape { left: 50%; transform: translateX(-50%); }
+    .skills-wrap { grid-template-columns: 1fr; }
+    .headshots { position: static; grid-template-columns: 1fr 1fr; }
+    .nav-links a:not(.lang-toggle) { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="logo display" href="#top">N<span>A</span></a>
+  <div class="nav-links">
+    <a href="#credits" data-i18n="nav_credits">Créditos</a>
+    <a class="timeline-link" href="timeline.html" data-i18n="nav_timeline">Timeline</a>
+    <a href="#skills" data-i18n="nav_skills">Habilidades</a>
+    <a href="#stats" data-i18n="nav_stats">Ficha</a>
+    <a href="#contact" data-i18n="nav_contact">Contacto</a>
+    <button class="lang-toggle" id="lang-toggle" type="button">ES · <b>EN</b></button>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="hero-copy">
+    <p class="eyebrow" data-i18n="hero_eyebrow">Cine · Series · Acción real</p>
+    <h1 class="display">Nicolas<br><em>Arcila</em></h1>
+    <p class="hero-role" data-i18n="hero_role">Stunt Performer · Fight Choreographer</p>
+    <div class="hero-badges">
+      <span class="badge">🇪🇸 <span data-i18n="badge_base">Base: Barcelona, España</span></span>
+      <span class="badge">🇨🇴 Colombia</span>
+      <span class="badge hot" data-i18n="badge_avail">Disponibilidad inmediata</span>
+      <span class="badge" data-i18n="badge_permit">Permiso de trabajo en regla</span>
+    </div>
+    <div class="hero-cta">
+      <a class="btn primary" href="mailto:Nico251001@outlook.com" data-i18n="cta_contact">Contáctame</a>
+      <a class="btn ghost timeline-link" href="timeline.html" data-i18n="cta_timeline">Ver trayectoria</a>
+      <a class="btn ghost" href="https://www.imdb.com/name/nm13020055/" target="_blank" rel="noreferrer">IMDb ↗</a>
+      <a class="btn ghost" href="https://www.instagram.com/nicolasarc25/" target="_blank" rel="noreferrer">Instagram ↗</a>
+    </div>
+  </div>
+  <figure class="hero-figure">
+    <img src="assets/hero.jpg" alt="Nicolas Arcila, stunt performer">
+    <span class="tape" data-i18n="tape">Listo para el set</span>
+  </figure>
+</header>
+
+<section id="credits">
+  <div class="sec-head">
+    <p class="kicker" data-i18n="credits_kicker">Trayectoria</p>
+    <h2 class="display" data-i18n="credits_title">Créditos</h2>
+    <p data-i18n="credits_sub">Producciones internacionales de cine y televisión, trabajando bajo coordinadores de stunts de primer nivel.</p>
+  </div>
+  <div class="credits">
+    <article class="credit">
+      <span class="num">01</span>
+      <h3>Narcos</h3>
+      <p class="meta">Netflix · T2–T3</p>
+      <p class="desc" data-i18n="c_narcos">Combate cuerpo a cuerpo, caídas controladas, rigging y acción dentro de vehículos en entornos urbanos.</p>
+    </article>
+    <article class="credit">
+      <span class="num">02</span>
+      <h3>Jack Ryan</h3>
+      <p class="meta">Prime Video · T2</p>
+      <p class="desc" data-i18n="c_jack">Escenas de combate e impactos en localizaciones reales bajo estrictos protocolos de seguridad.</p>
+    </article>
+    <article class="credit">
+      <span class="num">03</span>
+      <h3>Triple Frontier</h3>
+      <p class="meta">Netflix</p>
+      <p class="desc" data-i18n="c_triple">Acción táctica y combate en exteriores y entornos complejos.</p>
+    </article>
+    <article class="credit">
+      <span class="num">04</span>
+      <h3>Gemini Man</h3>
+      <p class="meta">Paramount</p>
+      <p class="desc" data-i18n="c_gemini">Acción física y combate con precisión de timing y continuidad para VFX.</p>
+    </article>
+    <article class="credit">
+      <span class="num">05</span>
+      <h3>Mile 22</h3>
+      <p class="meta">STX Entertainment</p>
+      <p class="desc" data-i18n="c_mile">Secuencias de acción de alta intensidad para largometraje.</p>
+    </article>
+    <article class="credit">
+      <span class="num">06</span>
+      <h3>Sound of Freedom</h3>
+      <p class="meta">Angel Studios</p>
+      <p class="desc" data-i18n="c_sound">Acción física en producción cinematográfica internacional.</p>
+    </article>
+    <article class="credit">
+      <span class="num">07</span>
+      <h3>El Chapo</h3>
+      <p class="meta">Netflix · Univision · T1–T3</p>
+      <p class="desc" data-i18n="c_chapo">Combate físico, caídas e impactos para televisión.</p>
+    </article>
+    <article class="credit">
+      <span class="num">08</span>
+      <h3>Loving Pablo</h3>
+      <p class="meta">Film</p>
+      <p class="desc" data-i18n="c_pablo">Acción y combate en largometraje internacional.</p>
+    </article>
+    <article class="credit">
+      <span class="num">09</span>
+      <h3>Distrito Salvaje</h3>
+      <p class="meta">Netflix · T1–T2</p>
+      <p class="desc" data-i18n="c_distrito">Secuencias de acción para serie original de Netflix.</p>
+    </article>
+    <article class="credit coord">
+      <span class="num">10</span>
+      <span class="role-tag" data-i18n="tag_coord">Stunt Coordinator</span>
+      <h3>Al Son que me Toquen Bailo</h3>
+      <p class="meta" data-i18n="c_alson_meta">Coordinación de stunts</p>
+      <p class="desc" data-i18n="c_alson">Diseño y coordinación de secuencias de acción y seguridad en set.</p>
+    </article>
+  </div>
+  <div class="section-cta">
+    <a class="btn ghost timeline-link" href="timeline.html" data-i18n="credits_timeline">Ver timeline completa →</a>
+  </div>
+</section>
+
+<section id="skills">
+  <div class="sec-head">
+    <p class="kicker" data-i18n="skills_kicker">Especialidades</p>
+    <h2 class="display" data-i18n="skills_title">Habilidades</h2>
+  </div>
+  <div class="skills-wrap">
+    <div class="skill-list">
+      <div class="skill"><span class="icon">🥊</span><div><strong data-i18n="s1">Combate y fight choreography</strong><span data-i18n="s1d">Cuerpo a cuerpo, armas de utilería, precisión para cámara</span></div></div>
+      <div class="skill"><span class="icon">🪂</span><div><strong data-i18n="s2">Caídas controladas y parkour</strong><span data-i18n="s2d">Caídas, impactos, escaleras y saltos</span></div></div>
+      <div class="skill"><span class="icon">🪢</span><div><strong data-i18n="s3">Rigging y wire work</strong><span data-i18n="s3d">Trabajo aéreo asistido con cables</span></div></div>
+      <div class="skill"><span class="icon">🚗</span><div><strong data-i18n="s4">Acción en vehículos</strong><span data-i18n="s4d">Escenas dentro y alrededor de vehículos</span></div></div>
+      <div class="skill"><span class="icon">🏍️</span><div><strong data-i18n="s5">Stunts en moto</strong><span data-i18n="s5d">Motocicletas (bikes)</span></div></div>
+      <div class="skill"><span class="icon">🌊</span><div><strong data-i18n="s6">Stunts acuáticos</strong><span data-i18n="s6d">Acción en agua y entornos húmedos</span></div></div>
+      <div class="skill"><span class="icon">🔥</span><div><strong data-i18n="s7">Fuego y pirotecnia</strong><span data-i18n="s7d">Bajo supervisión especializada</span></div></div>
+      <div class="skill"><span class="icon">🛡️</span><div><strong data-i18n="s8">Protocolos de seguridad</strong><span data-i18n="s8d">Cultura de seguridad en set, trabajo con coordinadores</span></div></div>
+    </div>
+    <div class="headshots">
+      <img src="assets/headshot1.jpg" alt="Headshot Nicolas Arcila">
+      <img src="assets/headshot2.jpg" alt="Headshot Nicolas Arcila 2">
+    </div>
+  </div>
+</section>
+
+<section id="stats">
+  <div class="sec-head">
+    <p class="kicker" data-i18n="stats_kicker">Ficha técnica</p>
+    <h2 class="display" data-i18n="stats_title">Datos</h2>
+  </div>
+  <div class="stats-grid">
+    <div class="stat"><p class="val">1.74 m</p><p class="lab" data-i18n="st_height">Estatura</p></div>
+    <div class="stat"><p class="val">42 EU</p><p class="lab" data-i18n="st_shoe">Calzado</p></div>
+    <div class="stat"><p class="val">ES · EN</p><p class="lab" data-i18n="st_lang">Idiomas</p></div>
+    <div class="stat"><p class="val display">✓</p><p class="lab" data-i18n="st_permit">Permiso de trabajo</p></div>
+  </div>
+  <div class="measures">
+    <span class="badge" data-i18n="m_head">Cabeza <b>57 cm</b></span>
+    <span class="badge" data-i18n="m_neck">Cuello <b>37.5 cm</b></span>
+    <span class="badge" data-i18n="m_chest">Pecho <b>97 cm</b></span>
+    <span class="badge" data-i18n="m_biceps">Bíceps <b>32 cm</b></span>
+    <span class="badge" data-i18n="m_waist">Cintura <b>82 cm</b></span>
+    <span class="badge" data-i18n="m_thigh">Muslo <b>48 cm</b></span>
+  </div>
+</section>
+
+<section id="videos">
+  <div class="sec-head">
+    <p class="kicker" data-i18n="videos_kicker">En acción</p>
+    <h2 class="display" data-i18n="videos_title">Material</h2>
+  </div>
+  <div class="video-grid" id="video-grid">
+    <video src="assets/videos/clip1.mp4" controls preload="metadata"></video>
+    <video src="assets/videos/clip2.mp4" controls preload="metadata"></video>
+    <video src="assets/videos/clip3.mp4" controls preload="metadata"></video>
+    <video src="assets/videos/clip4.mp4" controls preload="metadata"></video>
+    <video src="assets/videos/clip5.mp4" controls preload="metadata"></video>
+    <video src="assets/videos/clip6.mp4" controls preload="metadata"></video>
+  </div>
+  <div class="video-note hidden" id="video-note" data-i18n="videos_note">
+    Próximamente: material en acción. (Para añadir clips, guárdalos como clip1.mp4, clip2.mp4... en la carpeta assets/videos)
+  </div>
+</section>
+
+<section id="contact">
+  <div class="contact-box">
+    <p class="kicker" data-i18n="contact_kicker" style="color: var(--accent); font-weight:700; letter-spacing:0.25em; text-transform:uppercase; font-size:12px;">¿Preparando un proyecto?</p>
+    <h2 class="display" data-i18n="contact_title">Hablemos</h2>
+    <p data-i18n="contact_sub">Disponible para cine, series y publicidad. Base en Barcelona, disponible internacionalmente.</p>
+    <div class="hero-cta">
+      <a class="btn primary" href="mailto:Nico251001@outlook.com">Nico251001@outlook.com</a>
+      <a class="btn ghost" href="https://www.imdb.com/name/nm13020055/" target="_blank" rel="noreferrer">IMDb ↗</a>
+      <a class="btn ghost" href="https://www.instagram.com/nicolasarc25/" target="_blank" rel="noreferrer">Instagram ↗</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>© <span id="year"></span> Nicolas Arcila · Stunt Performer</p>
+</footer>
+
+<script>
+  document.getElementById("year").textContent = new Date().getFullYear();
+
+  // hide missing videos; show note if none present
+  const grid = document.getElementById("video-grid");
+  const note = document.getElementById("video-note");
+  let loaded = 0, checked = 0;
+  const clips = grid.querySelectorAll("video");
+  clips.forEach((v) => {
+    v.addEventListener("loadedmetadata", () => { loaded += 1; checked += 1; settle(); });
+    v.addEventListener("error", () => { v.remove(); checked += 1; settle(); });
+  });
+  function settle() {
+    if (checked === clips.length && loaded === 0) {
+      grid.style.display = "none";
+      note.classList.remove("hidden");
+      note.style.display = "block";
+    }
+  }
+  note.style.display = "none";
+
+  // i18n
+  const translations = {
+    en: {
+      nav_credits: "Credits", nav_timeline: "Timeline", nav_skills: "Skills", nav_stats: "Stats", nav_contact: "Contact",
+      hero_eyebrow: "Film · TV · Real action",
+      hero_role: "Stunt Performer · Fight Choreographer",
+      badge_base: "Based in Barcelona, Spain",
+      badge_avail: "Immediate availability",
+      badge_permit: "Valid work permit",
+      cta_contact: "Get in touch",
+      cta_timeline: "View career",
+      tape: "Set ready",
+      credits_kicker: "Track record", credits_title: "Credits",
+      credits_sub: "International film and TV productions, working under top-tier stunt coordinators.",
+      credits_timeline: "View full timeline →",
+      c_narcos: "Hand-to-hand combat, controlled falls, rigging and in-vehicle action in urban environments.",
+      c_jack: "Fight scenes and impacts on real locations under strict safety protocols.",
+      c_triple: "Tactical action and combat in exteriors and complex environments.",
+      c_gemini: "Physical action and combat with VFX-grade timing and continuity precision.",
+      c_mile: "High-intensity action sequences for feature film.",
+      c_sound: "Physical action for international feature production.",
+      c_chapo: "Physical combat, falls and impacts for television.",
+      c_pablo: "Action and combat in international feature film.",
+      c_distrito: "Action sequences for Netflix original series.",
+      tag_coord: "Stunt Coordinator",
+      c_alson_meta: "Stunt coordination",
+      c_alson: "Design and coordination of action sequences and on-set safety.",
+      skills_kicker: "Specialties", skills_title: "Skills",
+      s1: "Combat & fight choreography", s1d: "Hand-to-hand, prop weapons, camera-ready precision",
+      s2: "Controlled falls & parkour", s2d: "Falls, impacts, stairs and jumps",
+      s3: "Rigging & wire work", s3d: "Wire-assisted aerial work",
+      s4: "Vehicle action", s4d: "Scenes in and around vehicles",
+      s5: "Motorcycle stunts", s5d: "Bikes only",
+      s6: "Water stunts", s6d: "Action in water and wet environments",
+      s7: "Fire & pyrotechnics", s7d: "Under specialized supervision",
+      s8: "Safety protocols", s8d: "On-set safety culture, coordinator collaboration",
+      stats_kicker: "Technical sheet", stats_title: "Stats",
+      st_height: "Height", st_shoe: "Shoe size", st_lang: "Languages", st_permit: "Work permit",
+      m_head: "Head <b>57 cm</b>", m_neck: "Neck <b>37.5 cm</b>", m_chest: "Chest <b>97 cm</b>",
+      m_biceps: "Biceps <b>32 cm</b>", m_waist: "Waist <b>82 cm</b>", m_thigh: "Thighs <b>48 cm</b>",
+      videos_kicker: "In action", videos_title: "Footage",
+      videos_note: "Coming soon: action footage. (To add clips, save them as clip1.mp4, clip2.mp4... in assets/videos)",
+      contact_kicker: "Working on a project?", contact_title: "Let's talk",
+      contact_sub: "Available for film, TV and commercials. Based in Barcelona, available internationally."
+    },
+    es: {}
+  };
+
+  // capture original Spanish strings
+  document.querySelectorAll("[data-i18n]").forEach((el) => {
+    translations.es[el.dataset.i18n] = el.innerHTML;
+  });
+
+  let lang = new URLSearchParams(window.location.search).get("lang") === "en" ? "en" : "es";
+  const toggle = document.getElementById("lang-toggle");
+  function applyLanguage() {
+    document.documentElement.lang = lang;
+    toggle.innerHTML = lang === "es" ? "ES · <b>EN</b>" : "<b>ES</b> · EN";
+    toggle.setAttribute("aria-label", lang === "es" ? "Cambiar a inglés" : "Switch to Spanish");
+    document.querySelectorAll("[data-i18n]").forEach((el) => {
+      const value = translations[lang][el.dataset.i18n];
+      if (value) { el.innerHTML = value; }
+    });
+    document.querySelectorAll(".timeline-link").forEach((link) => {
+      link.href = lang === "en" ? "timeline.html?lang=en" : "timeline.html";
+    });
+  }
+  toggle.addEventListener("click", () => {
+    lang = lang === "es" ? "en" : "es";
+    const url = new URL(window.location.href);
+    if (lang === "en") { url.searchParams.set("lang", "en"); }
+    else { url.searchParams.delete("lang"); }
+    window.history.replaceState({}, "", url);
+    applyLanguage();
+  });
+  applyLanguage();
+</script>
+</body>
+</html>
