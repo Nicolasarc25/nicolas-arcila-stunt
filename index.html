@@ -19,6 +19,7 @@
     --accent-soft: rgba(224, 139, 61, 0.14);
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
+  [hidden] { display: none !important; }
   html { scroll-behavior: smooth; }
   body {
     background: var(--bg);
@@ -472,7 +473,10 @@
     <p class="kicker" data-i18n="videos_kicker">En acción</p>
     <h2 class="display" data-i18n="videos_title">Material</h2>
   </div>
-  <div class="video-grid" id="video-grid">
+  <!-- Footage state lives on <html data-footage="checking|ready|empty">.
+       To add clips: save them as assets/videos/clip1.mp4 … clip6.mp4. With no clips
+       the whole section stays hidden for visitors; the note below only shows on localhost. -->
+  <div class="video-grid" id="video-grid" hidden>
     <video src="assets/videos/clip1.mp4" controls preload="metadata"></video>
     <video src="assets/videos/clip2.mp4" controls preload="metadata"></video>
     <video src="assets/videos/clip3.mp4" controls preload="metadata"></video>
@@ -480,7 +484,7 @@
     <video src="assets/videos/clip5.mp4" controls preload="metadata"></video>
     <video src="assets/videos/clip6.mp4" controls preload="metadata"></video>
   </div>
-  <div class="video-note hidden" id="video-note" data-i18n="videos_note">
+  <div class="video-note" id="video-note" hidden>
     Próximamente: material en acción. (Para añadir clips, guárdalos como clip1.mp4, clip2.mp4... en la carpeta assets/videos)
   </div>
 </section>
@@ -505,23 +509,43 @@
 <script>
   document.getElementById("year").textContent = new Date().getFullYear();
 
-  // hide missing videos; show note if none present
-  const grid = document.getElementById("video-grid");
-  const note = document.getElementById("video-note");
-  let loaded = 0, checked = 0;
-  const clips = grid.querySelectorAll("video");
-  clips.forEach((v) => {
-    v.addEventListener("loadedmetadata", () => { loaded += 1; checked += 1; settle(); });
-    v.addEventListener("error", () => { v.remove(); checked += 1; settle(); });
-  });
-  function settle() {
-    if (checked === clips.length && loaded === 0) {
-      grid.style.display = "none";
-      note.classList.remove("hidden");
-      note.style.display = "block";
+  // ── Footage gallery: checking → ready | empty ──
+  // The grid stays hidden until a clip proves it exists, so visitors never see broken players.
+  // With no clips the whole section is hidden; the setup note only shows on a local preview.
+  const footage = (() => {
+    const section = document.getElementById("videos");
+    const grid = document.getElementById("video-grid");
+    const note = document.getElementById("video-note");
+    const isLocal = location.protocol === "file:" || /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+    const clips = Array.from(grid.querySelectorAll("video"));
+    let pending = clips.length, loaded = 0, current = null;
+
+    function set(next) {
+      if (current === next || current === "ready") return; // ready is final: a later failure never hides working clips
+      current = next;
+      document.documentElement.dataset.footage = next;
+      grid.hidden = next !== "ready";
+      note.hidden = !(next === "empty" && isLocal);
+      section.hidden = next === "empty" && !isLocal;
     }
-  }
-  note.style.display = "none";
+    function settle(video, ok) {
+      if (video.dataset.state) return;            // each clip settles exactly once
+      video.dataset.state = ok ? "ok" : "missing";
+      pending -= 1;
+      if (ok) { loaded += 1; set("ready"); }
+      else { video.remove(); if (pending === 0 && loaded === 0) set("empty"); }
+    }
+
+    set(clips.length ? "checking" : "empty");
+    clips.forEach((v) => {
+      v.addEventListener("loadedmetadata", () => settle(v, true));
+      v.addEventListener("error", () => settle(v, false));
+      // events may have fired before this script ran
+      if (v.readyState >= 1) settle(v, true);
+      else if (v.error) settle(v, false);
+    });
+    return { get state() { return current; }, get clips() { return loaded; } };
+  })();
 
   // i18n
   const translations = {
@@ -564,7 +588,6 @@
       m_head: "Head <b>57 cm</b>", m_neck: "Neck <b>37.5 cm</b>", m_chest: "Chest <b>97 cm</b>",
       m_biceps: "Biceps <b>32 cm</b>", m_waist: "Waist <b>82 cm</b>", m_thigh: "Thighs <b>48 cm</b>",
       videos_kicker: "In action", videos_title: "Footage",
-      videos_note: "Coming soon: action footage. (To add clips, save them as clip1.mp4, clip2.mp4... in assets/videos)",
       contact_kicker: "Working on a project?", contact_title: "Let's talk",
       contact_sub: "Available for film, TV and commercials. Based in Barcelona, available internationally."
     },
@@ -576,29 +599,43 @@
     translations.es[el.dataset.i18n] = el.innerHTML;
   });
 
-  let lang = new URLSearchParams(window.location.search).get("lang") === "en" ? "en" : "es";
+  // ── Language: es | en ──
+  // Same rules as timeline.html: ?lang wins; otherwise the visitor's browser decides
+  // (Spanish/Catalan browsers → es, everyone else → en). The URL only carries ?lang
+  // when it differs from that default, so shared links adapt to whoever opens them.
+  const LANGS = ["es", "en"];
+  const browserLang = /^(es|ca|gl|eu)\b/i.test((navigator.languages && navigator.languages[0]) || navigator.language || "es") ? "es" : "en";
+  const urlLang = new URLSearchParams(window.location.search).get("lang");
+  let lang = LANGS.includes(urlLang) ? urlLang : browserLang;
   const toggle = document.getElementById("lang-toggle");
+  function withLang(page) { return page + (lang === browserLang ? "" : "?lang=" + lang); }
   function applyLanguage() {
     document.documentElement.lang = lang;
+    document.documentElement.dataset.lang = lang;
     toggle.innerHTML = lang === "es" ? "ES · <b>EN</b>" : "<b>ES</b> · EN";
     toggle.setAttribute("aria-label", lang === "es" ? "Cambiar a inglés" : "Switch to Spanish");
     document.querySelectorAll("[data-i18n]").forEach((el) => {
       const value = translations[lang][el.dataset.i18n];
       if (value) { el.innerHTML = value; }
     });
-    document.querySelectorAll(".timeline-link").forEach((link) => {
-      link.href = lang === "en" ? "timeline.html?lang=en" : "timeline.html";
-    });
+    document.querySelectorAll(".timeline-link").forEach((link) => { link.href = withLang("timeline.html"); });
   }
-  toggle.addEventListener("click", () => {
-    lang = lang === "es" ? "en" : "es";
+  function setLang(next) {
+    if (!LANGS.includes(next) || next === lang) return;
+    lang = next;
     const url = new URL(window.location.href);
-    if (lang === "en") { url.searchParams.set("lang", "en"); }
-    else { url.searchParams.delete("lang"); }
+    if (lang === browserLang) url.searchParams.delete("lang"); else url.searchParams.set("lang", lang);
     window.history.replaceState({}, "", url);
     applyLanguage();
-  });
+  }
+  toggle.addEventListener("click", () => setLang(lang === "es" ? "en" : "es"));
   applyLanguage();
+
+  // Read-only state for scripts, tests and agents: window.portfolio.state
+  window.portfolio = {
+    get state() { return { lang, footage: footage.state, clips: footage.clips }; },
+    setLang
+  };
 </script>
 </body>
 </html>
