@@ -1063,11 +1063,25 @@
     }
   };
 
-  const state = {
-    lang: new URLSearchParams(window.location.search).get("lang") === "en" ? "en" : "es",
+  // ── Page state: lang × filter × sort ──
+  // One source of truth, mirrored to the URL (so a filtered view can be shared, e.g.
+  // ?filter=coordination for a coordination job) and to <html data-*> for scripts and agents.
+  // Values outside these lists are ignored, never rendered.
+  const LANGS = ["es", "en"];
+  const FILTERS = ["all", "film", "series", "coordination"];
+  const SORTS = ["asc", "desc"];
+  const DEFAULTS = {
+    lang: /^(es|ca|gl|eu)\b/i.test((navigator.languages && navigator.languages[0]) || navigator.language || "es") ? "es" : "en",
     filter: "all",
     sort: "asc"
   };
+  const ALLOWED = { lang: LANGS, filter: FILTERS, sort: SORTS };
+  const params = new URLSearchParams(window.location.search);
+  const state = {};
+  Object.keys(DEFAULTS).forEach(function(key) {
+    const value = params.get(key);
+    state[key] = ALLOWED[key].includes(value) ? value : DEFAULTS[key];
+  });
 
   const timelineList = document.getElementById("timeline-list");
   const resultCount = document.getElementById("result-count");
@@ -1147,6 +1161,11 @@
     const visible = visibleProjects();
     timelineList.innerHTML = visible.map(projectMarkup).join("");
     resultCount.textContent = visible.length + " " + translations[state.lang].result;
+    document.querySelectorAll(".filter-button").forEach(function(item) {
+      item.setAttribute("aria-pressed", item.dataset.filter === state.filter ? "true" : "false");
+    });
+    document.documentElement.dataset.timelineFilter = state.filter;
+    document.documentElement.dataset.timelineSort = state.sort;
     sortButton.textContent = state.sort === "asc"
       ? translations[state.lang].sort_newest
       : translations[state.lang].sort_oldest;
@@ -1157,6 +1176,7 @@
   function applyLanguage() {
     const t = translations[state.lang];
     document.documentElement.lang = state.lang;
+    document.documentElement.dataset.lang = state.lang;
     document.querySelectorAll("[data-i18n]").forEach(function(element) {
       const key = element.dataset.i18n;
       if (t[key]) element.textContent = t[key];
@@ -1171,7 +1191,7 @@
     });
     langToggle.innerHTML = state.lang === "es" ? "ES · <b>EN</b>" : "<b>ES</b> · EN";
     langToggle.setAttribute("aria-label", state.lang === "es" ? "Cambiar a inglés" : "Switch to Spanish");
-    backLink.href = state.lang === "en" ? "index.html?lang=en" : "index.html";
+    backLink.href = "index.html" + (state.lang === DEFAULTS.lang ? "" : "?lang=" + state.lang);
     renderTimeline();
   }
 
@@ -1203,29 +1223,41 @@
     lineFill.style.height = (ratio * 100).toFixed(2) + "%";
   }
 
-  document.querySelectorAll(".filter-button").forEach(function(button) {
-    button.addEventListener("click", function() {
-      state.filter = button.dataset.filter;
-      document.querySelectorAll(".filter-button").forEach(function(item) {
-        item.setAttribute("aria-pressed", item === button ? "true" : "false");
-      });
-      renderTimeline();
+  // The only way state changes: validate, write the URL, re-render what depends on it.
+  function setState(patch) {
+    let changed = false;
+    Object.keys(patch).forEach(function(key) {
+      const value = patch[key];
+      if (ALLOWED[key] && ALLOWED[key].includes(value) && state[key] !== value) { state[key] = value; changed = true; }
     });
+    if (!changed) return false;
+    const url = new URL(window.location.href);
+    Object.keys(DEFAULTS).forEach(function(key) {
+      if (state[key] === DEFAULTS[key]) url.searchParams.delete(key);
+      else url.searchParams.set(key, state[key]);
+    });
+    window.history.replaceState({}, "", url);
+    if ("lang" in patch) applyLanguage(); else renderTimeline();
+    return true;
+  }
+
+  document.querySelectorAll(".filter-button").forEach(function(button) {
+    button.addEventListener("click", function() { setState({ filter: button.dataset.filter }); });
   });
 
   sortButton.addEventListener("click", function() {
-    state.sort = state.sort === "asc" ? "desc" : "asc";
-    renderTimeline();
+    setState({ sort: state.sort === "asc" ? "desc" : "asc" });
   });
 
   langToggle.addEventListener("click", function() {
-    state.lang = state.lang === "es" ? "en" : "es";
-    const url = new URL(window.location.href);
-    if (state.lang === "en") url.searchParams.set("lang", "en");
-    else url.searchParams.delete("lang");
-    window.history.replaceState({}, "", url);
-    applyLanguage();
+    setState({ lang: state.lang === "es" ? "en" : "es" });
   });
+
+  // Read-only state for scripts, tests and agents: window.timeline.state
+  window.timeline = {
+    get state() { return Object.assign({}, state, { visible: visibleProjects().map(function(p) { return p.id; }) }); },
+    setState: setState
+  };
 
   window.addEventListener("scroll", function() {
     if (!ticking) {
